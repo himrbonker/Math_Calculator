@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  font-family: 'Inter', sans-serif;
+}
+
+/* subtle grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.calc-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.calc {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 24px;
+  padding: 24px;
+  width: 320px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* DISPLAY */
+.display-wrap {
+  background: #0d0d0d;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 16px 20px 14px;
+  margin-bottom: 20px;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.display-expr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: rgba(255,255,255,0.25);
+  min-height: 18px;
+  word-break: break-all;
+  text-align: right;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.display-main {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 36px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -1px;
+  word-break: break-all;
+  text-align: right;
+  line-height: 1.1;
+  transition: color 0.2s;
+}
+.display-main.result { color: #4ade80; }
+.display-main.error  { color: #f87171; font-size: 22px; }
+.display-main.access { color: #4ade80; font-size: 18px; letter-spacing: 1px; }
+
+/* BUTTONS GRID */
+.btn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.btn {
+  height: 64px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.08s ease, filter 0.12s ease, background 0.12s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn:active { transform: scale(0.93); }
+.btn.pressed { transform: scale(0.93); filter: brightness(1.3); }
+
+/* Number buttons */
+.btn-num {
+  background: #1e1e1e;
+  color: #f0f0f0;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.btn-num:hover { background: #252525; }
+
+/* Operator buttons */
+.btn-op {
+  background: #1a1a2e;
+  color: #818cf8;
+  border: 1px solid rgba(129,140,248,0.15);
+  font-size: 20px;
+}
+.btn-op:hover { background: #1e1e38; }
+
+/* Equals */
+.btn-eq {
+  background: #4ade80;
+  color: #052e16;
+  font-weight: 600;
+  font-size: 22px;
+  border: none;
+}
+.btn-eq:hover { background: #5de88e; }
+
+/* Clear */
+.btn-clear {
+  background: #2d1515;
+  color: #f87171;
+  border: 1px solid rgba(248,113,113,0.15);
+}
+.btn-clear:hover { background: #3a1a1a; }
+
+/* Backspace */
+.btn-back {
+  background: #1e1e1e;
+  color: #94a3b8;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 20px;
+}
+.btn-back:hover { background: #252525; }
+
+/* Zero — spans 2 cols */
+.btn-zero {
+  grid-column: span 2;
+  text-align: left;
+  padding-left: 24px;
+}
+
+/* Secret unlock button */
+.btn-secret {
+  grid-column: span 4;
+  height: 52px;
+  background: linear-gradient(135deg, #052e16, #0f3d20);
+  color: #4ade80;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  border: 1px solid rgba(74,222,128,0.25);
+  border-radius: 12px;
+  margin-top: 4px;
+  display: none;
+  animation: revealBtn 0.4s ease forwards;
+}
+.btn-secret:hover { background: linear-gradient(135deg, #083d1e, #155728); }
+.btn-secret.visible { display: block; }
+
+@keyframes revealBtn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* keyboard focus ring */
+.btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
+}
+</style>
+</head>
+<body>
+
+<div class="calc-wrap">
+  <div class="calc">
+
+    <div class="display-wrap">
+      <div class="display-expr" id="expr"></div>
+      <div class="display-main" id="display">0</div>
+    </div>
+
+    <div class="btn-grid" id="btnGrid">
+      <!-- Row 1 -->
+      <button class="btn btn-clear"  data-action="clear">C</button>
+      <button class="btn btn-back"   data-action="back">⌫</button>
+      <button class="btn btn-op"     data-action="op" data-val="%">%</button>
+      <button class="btn btn-op"     data-action="op" data-val="/">÷</button>
+      <!-- Row 2 -->
+      <button class="btn btn-num"    data-action="num" data-val="7">7</button>
+      <button class="btn btn-num"    data-action="num" data-val="8">8</button>
+      <button class="btn btn-num"    data-action="num" data-val="9">9</button>
+      <button class="btn btn-op"     data-action="op" data-val="*">×</button>
+      <!-- Row 3 -->
+      <button class="btn btn-num"    data-action="num" data-val="4">4</button>
+      <button class="btn btn-num"    data-action="num" data-val="5">5</button>
+      <button class="btn btn-num"    data-action="num" data-val="6">6</button>
+      <button class="btn btn-op"     data-action="op" data-val="-">−</button>
+      <!-- Row 4 -->
+      <button class="btn btn-num"    data-action="num" data-val="1">1</button>
+      <button class="btn btn-num"    data-action="num" data-val="2">2</button>
+      <button class="btn btn-num"    data-action="num" data-val="3">3</button>
+      <button class="btn btn-op"     data-action="op" data-val="+">+</button>
+      <!-- Row 5 -->
+      <button class="btn btn-num btn-zero" data-action="num" data-val="0">0</button>
+      <button class="btn btn-num"    data-action="decimal">.</button>
+      <button class="btn btn-eq"     data-action="equals">=</button>
+
+      <!-- Secret unlock — hidden until code entered -->
+      <button class="btn btn-secret" id="secretBtn" onclick="openArcade()">ARCADE &#9889;</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let expr = '';
+let justCalc = false;
+
+const dispMain = document.getElementById('display');
+const dispExpr = document.getElementById('expr');
+const secretBtn = document.getElementById('secretBtn');
+
+function updateDisplay(main, expr_val, cls) {
+  dispMain.className = 'display-main' + (cls ? ' ' + cls : '');
+  dispMain.textContent = main || '0';
+  dispExpr.textContent = expr_val || '';
+}
+
+function pressNum(val) {
+  if (justCalc) { expr = ''; justCalc = false; }
+  // prevent multiple leading zeros
+  if (expr === '0') expr = '';
+  expr += val;
+  updateDisplay(expr);
+}
+
+function pressOp(val) {
+  justCalc = false;
+  if (expr === '' && val === '-') { expr = '-'; updateDisplay('-'); return; }
+  if (expr === '') return;
+  // replace trailing operator
+  const last = expr.slice(-1);
+  if (['+','-','*','/','%'].includes(last)) expr = expr.slice(0,-1);
+  expr += val;
+  updateDisplay(expr);
+}
+
+function pressDecimal() {
+  if (justCalc) { expr = '0'; justCalc = false; }
+  // find last number segment — add decimal only if it doesn't have one
+  const parts = expr.split(/[\+\-\*\/\%]/);
+  const last = parts[parts.length - 1];
+  if (last.includes('.')) return;
+  if (last === '') expr += '0';
+  expr += '.';
+  updateDisplay(expr);
+}
+
+function pressBack() {
+  if (justCalc) return;
+  expr = expr.slice(0, -1);
+  updateDisplay(expr || '0');
+}
+
+function pressClear() {
+  expr = '';
+  justCalc = false;
+  updateDisplay('0');
+  dispExpr.textContent = '';
+}
+
+function pressEquals() {
+  if (expr === '9932') {
+    updateDisplay('ACCESS GRANTED', '', 'access');
+    secretBtn.classList.add('visible');
+    expr = '';
+    justCalc = true;
+    return;
+  }
+  if (expr === '') return;
+  try {
+    const safe = expr.replace(/[^0-9+\-*/.%()]/g, '');
+    const result = Function('"use strict"; return (' + safe + ')')();
+    const resultStr = parseFloat(result.toFixed(10)).toString();
+    dispExpr.textContent = expr + ' =';
+    expr = resultStr;
+    updateDisplay(resultStr, expr.slice(0,-expr.length) || (dispExpr.textContent), 'result');
+    dispMain.textContent = resultStr;
+    justCalc = true;
+  } catch {
+    updateDisplay('Error', expr, 'error');
+    expr = '';
+    justCalc = true;
+  }
+}
+
+function openArcade() {
+  window.location.href = 'lightning_arcade.html';
+}
+
+// Button click events
+document.getElementById('btnGrid').addEventListener('click', e => {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === 'num')     pressNum(btn.dataset.val);
+  if (action === 'op')      pressOp(btn.dataset.val);
+  if (action === 'decimal') pressDecimal();
+  if (action === 'back')    pressBack();
+  if (action === 'clear')   pressClear();
+  if (action === 'equals')  pressEquals();
+
+  // visual press flash
+  btn.classList.add('pressed');
+  setTimeout(() => btn.classList.remove('pressed'), 100);
+});
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (e.key >= '0' && e.key <= '9')       { pressNum(e.key);   flashKey(e.key); }
+  else if (e.key === '+')                  { pressOp('+');      flashKey('+'); }
+  else if (e.key === '-')                  { pressOp('-');      flashKey('-'); }
+  else if (e.key === '*')                  { pressOp('*');      flashKey('*'); }
+  else if (e.key === '/')                  { e.preventDefault(); pressOp('/'); flashKey('/'); }
+  else if (e.key === '%')                  { pressOp('%');      flashKey('%'); }
+  else if (e.key === '.')  { pressDecimal(); flashKey('.'); }
+  else if (e.key === 'Enter' || e.key === '=') { pressEquals(); flashKey('='); }
+  else if (e.key === 'Backspace')          { pressBack();  flashKey('back'); }
+  else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') { pressClear(); flashKey('clear'); }
+});
+
+function flashKey(key) {
+  const map = {
+    '0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9',
+    '+':'+','-':'−','*':'×','/':'÷','%':'%','.':'.','=':'=','back':'⌫','clear':'C'
+  };
+  const label = map[key];
+  if (!label) return;
+  const btns = document.querySelectorAll('.btn');
+  btns.forEach(b => {
+    if (b.textContent.trim() === label) {
+      b.classList.add('pressed');
+      setTimeout(() => b.classList.remove('pressed'), 100);
+    }
+  });
+}
+</script>
+</body>
+</html>
