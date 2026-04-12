@@ -3,370 +3,569 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚡ Lightning Arcade</title>
-
+<title>Lightning Arc@de</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 
-/* BACKGROUND */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-margin:0;
-font-family: 'Segoe UI', sans-serif;
-color:white;
-background: radial-gradient(circle at top, #0f0f1f, #050508);
-overflow-x:hidden;
+:root {
+  --white: #ffffff;
+  --light: #cccccc;
+  --mid: #888888;
+  --dark: #333333;
+  --black: #000000;
+  --overlay: rgba(0,0,0,0.72);
 }
 
-/* subtle animated glow */
-
-body::before{
-content:"";
-position:fixed;
-width:200%;
-height:200%;
-background: radial-gradient(circle, rgba(0,229,255,0.08), transparent 60%);
-animation: pulse 6s infinite linear;
-z-index:-1;
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--white);
+  overflow-x: hidden;
+  background: #000;
 }
 
-@keyframes pulse{
-0%{transform:translate(-25%,-25%)}
-50%{transform:translate(-30%,-30%)}
-100%{transform:translate(-25%,-25%)}
+/* ── BACKGROUND ── */
+#bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  background: #111;
+}
+#bg-layer img, #bg-layer video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(100%) brightness(0.45);
 }
 
-/* TOP BAR */
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:18px 30px;
-background:rgba(15,15,25,0.8);
-backdrop-filter:blur(10px);
-border-bottom:2px solid rgba(0,229,255,0.5);
+/* scanline overlay */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 1;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.18) 3px,
+    rgba(0,0,0,0.18) 4px
+  );
+  pointer-events: none;
 }
 
-.logo{
-font-size:28px;
-font-weight:800;
-background: linear-gradient(90deg,#00e5ff,#7a5cff);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-text-shadow:0 0 20px rgba(0,229,255,0.7);
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 28px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.logo-small {
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 2px;
+  cursor: pointer;
+  filter: grayscale(100%);
+  transition: filter 0.3s;
+  text-decoration: none;
+}
+.logo-small:hover { filter: grayscale(0%); color: #00e5ff; }
+
+.nav { display: flex; gap: 10px; align-items: center; }
+
+.nav button {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--mid);
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  filter: grayscale(100%);
+  transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s, box-shadow 0.25s;
+  letter-spacing: 1px;
+}
+.nav button:hover {
+  filter: grayscale(0%);
+  transform: scale(1.12);
+  color: #000;
+  background: #00e5ff;
+  box-shadow: 0 0 16px #00e5ff;
+  border-color: #00e5ff;
 }
 
-/* NAV */
+/* bg change btn */
+#bgBtn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--mid);
+  font-size: 18px;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  filter: grayscale(100%);
+  transition: filter 0.25s, transform 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+#bgBtn:hover { filter: grayscale(0%); transform: scale(1.15); }
 
-.nav button{
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(0,229,255,0.2);
-color:white;
-font-size:15px;
-margin-left:15px;
-cursor:pointer;
-padding:8px 14px;
-border-radius:10px;
-transition:0.25s;
+#bgInput { display: none; }
+
+/* ── PAGES ── */
+.page { display: none; position: relative; z-index: 10; }
+.page.active { display: block; }
+
+/* ── HOME SCREEN ── */
+#homePage {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start;
+  padding-top: 110px;
 }
 
-.nav button:hover{
-background:#00e5ff;
-color:black;
-box-shadow:0 0 12px #00e5ff;
+.hero {
+  text-align: center;
+  margin-bottom: 60px;
 }
 
-/* PAGE */
-
-.container{
-padding:30px;
+/* FLICKER ANIMATION */
+@keyframes flicker {
+  0%   { opacity: 0; }
+  5%   { opacity: 1; }
+  6%   { opacity: 0; }
+  7%   { opacity: 1; }
+  10%  { opacity: 0; }
+  11%  { opacity: 1; }
+  15%  { opacity: 0.4; }
+  16%  { opacity: 1; }
+  20%  { opacity: 0; }
+  22%  { opacity: 1; }
+  30%  { opacity: 0.7; }
+  31%  { opacity: 0; }
+  32%  { opacity: 1; }
+  40%  { opacity: 1; }
+  50%  { opacity: 0.9; }
+  51%  { opacity: 0; }
+  52%  { opacity: 1; }
+  100% { opacity: 1; }
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:22px;
+@keyframes glow-pulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.1); }
+  50% { text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 60px rgba(255,255,255,0.2); }
 }
 
-/* CARD */
-
-.card{
-background:rgba(20,20,30,0.6);
-border-radius:16px;
-overflow:hidden;
-cursor:pointer;
-transition:0.3s;
-border:1px solid rgba(255,255,255,0.05);
-backdrop-filter:blur(6px);
-position:relative;
+.hero-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(38px, 8vw, 90px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--white);
+  animation: flicker 2.5s ease-out forwards, glow-pulse 4s ease-in-out infinite 2.5s;
+  line-height: 1.1;
 }
 
-.card::after{
-content:"";
-position:absolute;
-inset:0;
-border-radius:16px;
-background:linear-gradient(120deg,transparent,#00e5ff55,transparent);
-opacity:0;
-transition:0.3s;
+.hero-title .at { color: var(--light); }
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--mid);
+  letter-spacing: 6px;
+  margin-top: 16px;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 0.6s ease forwards 2.8s;
 }
 
-.card:hover{
-transform:translateY(-6px) scale(1.04);
-box-shadow:0 0 25px rgba(0,229,255,0.4);
-border:1px solid rgba(0,229,255,0.4);
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.card:hover::after{
-opacity:1;
+/* featured games strip on home */
+.home-label {
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: var(--mid);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  text-align: center;
+  opacity: 0;
+  animation: fadeUp 0.5s ease forwards 3s;
 }
 
-.card img{
-width:100%;
-height:140px;
-object-fit:cover;
+.home-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0 20px;
+  opacity: 0;
+  animation: fadeUp 0.7s ease forwards 3.2s;
+}
+.home-grid .card {
+  width: 200px;
+  height: 200px;
 }
 
-.card p{
-text-align:center;
-padding:12px;
-font-weight:bold;
-letter-spacing:0.5px;
+/* ── GAME GRID (library pages) ── */
+.container { padding: 100px 30px 40px; }
+.section-title {
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: var(--mid);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
 }
 
-/* PLAYER */
-
-.player{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.95);
-display:none;
-flex-direction:column;
-z-index:100;
+/* ── CARD ── */
+.card {
+  aspect-ratio: 1/1;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  filter: grayscale(100%) brightness(0.7);
+  transition: filter 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
-.player iframe{
-flex:1;
-border:none;
+.card img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.playerbar{
-background:rgba(10,10,20,0.9);
-padding:12px;
-border-bottom:1px solid rgba(0,229,255,0.3);
+/* no text labels — just image */
+.card p { display: none; }
+
+.card:hover {
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.13);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.35);
+  z-index: 5;
 }
 
-.playerbar button{
-background:linear-gradient(90deg,#00e5ff,#7a5cff);
-border:none;
-padding:8px 16px;
-border-radius:8px;
-cursor:pointer;
-color:black;
-font-weight:bold;
-box-shadow:0 0 10px #00e5ff;
-transition:0.2s;
+/* tooltip on hover */
+.card::before {
+  content: attr(data-name);
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.82);
+  color: white;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 6px 4px;
+  transform: translateY(100%);
+  transition: transform 0.2s ease;
+  z-index: 2;
+  font-family: 'Share Tech Mono', monospace;
+}
+.card:hover::before { transform: translateY(0); }
+
+/* ── PLAYER ── */
+.player {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.97);
+  display: none; flex-direction: column;
+}
+.player.open { display: flex; }
+
+.player iframe { flex: 1; border: none; width: 100%; }
+
+.playerbar {
+  background: rgba(5,5,5,0.95);
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; gap: 12px;
 }
 
-.playerbar button:hover{
-transform:scale(1.05);
+.playerbar button {
+  font-family: 'Share Tech Mono', monospace;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--mid);
+  padding: 7px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  filter: grayscale(100%);
+  transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s;
 }
+.playerbar button:hover {
+  filter: grayscale(0%);
+  transform: scale(1.1);
+  color: #000; background: #00e5ff;
+  border-color: #00e5ff;
+}
+
+/* bg panel */
+#bgPanel {
+  display: none;
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0,0,0,0.88);
+  align-items: center; justify-content: center;
+}
+#bgPanel.open { display: flex; }
+.bg-box {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 32px;
+  width: 380px;
+  display: flex; flex-direction: column; gap: 14px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.bg-box h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.bg-box p { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
+.bg-box label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 12px; color: var(--light); letter-spacing: 1px;
+  cursor: pointer;
+}
+.bg-box label span {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--mid);
+  transition: 0.2s;
+  text-align: center;
+}
+.bg-box label:hover span { background: rgba(255,255,255,0.12); color: #fff; }
+.bg-box input[type=text] {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: white;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  width: 100%;
+}
+.bg-box input[type=text]::placeholder { color: var(--dark); }
+.bg-box .row { display: flex; gap: 10px; }
+.bg-box .row button {
+  flex: 1;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  padding: 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: 0.2s;
+}
+.bg-box .row button.apply {
+  background: white; color: black; border: none;
+}
+.bg-box .row button.apply:hover { background: #00e5ff; }
+.bg-box .row button.cancel {
+  background: transparent; color: var(--mid);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.bg-box .row button.cancel:hover { color: white; }
 
 </style>
 </head>
-
 <body>
 
+<!-- BACKGROUND -->
+<div id="bg-layer">
+  <img id="bgImg" src="" alt="" style="display:none">
+  <video id="bgVid" src="" autoplay loop muted playsinline style="display:none"></video>
+</div>
+
+<!-- TOPBAR -->
 <div class="topbar">
-<div class="logo">⚡ Lightning Arcade</div>
-
-<div class="nav">
-<button onclick="showSection('games')">Games</button>
-<button onclick="showSection('apps')">Apps</button>
-<button onclick="showSection('webs')">Websites</button>
-</div>
-</div>
-
-<div class="container">
-
-<!-- GAMES -->
-
-<div id="gamesSection">
-<div class="grid">
-
-<div class="card" onclick="playGame('Karlson.html')">
-<img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1228610/capsule_616x353.jpg?t=1649362618">
-<p>Karlson</p>
+  <a class="logo-small" onclick="goHome()">⚡ Arc@de</a>
+  <div class="nav">
+    <button onclick="showPage('games')">Games</button>
+    <button onclick="showPage('apps')">Apps</button>
+    <button onclick="showPage('webs')">Sites</button>
+    <button id="bgBtn" onclick="openBgPanel()" title="Change Background">🖼</button>
+  </div>
 </div>
 
-<div class="card" onclick="playGame('A Difficult Game About Climbing.html')">
-<img src="https://www4.minijuegosgratis.com/v3/games/thumbnails/249029_7_sq.jpg">
-<p>A Difficult Game About Climbing</p>
+<!-- HOME PAGE -->
+<div id="homePage" class="page active">
+  <div class="hero">
+    <div class="hero-title">Lightning<br>Arc<span class="at">@</span>de</div>
+    <div class="hero-sub">Insert coin to continue</div>
+  </div>
+  <div class="home-label">Featured Games</div>
+  <div class="home-grid">
+    <div class="card" data-name="Karlson" onclick="playGame('Karlson.html')">
+      <img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1228610/capsule_616x353.jpg?t=1649362618">
+    </div>
+    <div class="card" data-name="Minecraft" onclick="playGame('Minecraft 1.12.2.html')">
+      <img src="https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/d/9/a/d9a1f186e29d35026b1a5822fe63950cf59c426d.jpeg">
+    </div>
+    <div class="card" data-name="Hollow Knight" onclick="playGame('Hollow Knight.html')">
+      <img src="https://upload.wikimedia.org/wikipedia/en/d/de/Hollow_Knight_2026_cover_art.jpg">
+    </div>
+    <div class="card" data-name="Roblox" onclick="playGame('roblox.html')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png">
+    </div>
+    <div class="card" data-name="Undertale" onclick="playGame('https://frogiesarcade.net/stuff/selfhosted/undertale/index.html')">
+      <img src="https://s3.amazonaws.com/gameopedia_covers/covers/504052/afa774e7566c0e592f9a3d958a70d73e.png">
+    </div>
+  </div>
 </div>
 
-<div class="card" onclick="playGame('Hollow Knight.html')">
-<img src="https://upload.wikimedia.org/wikipedia/en/d/de/Hollow_Knight_2026_cover_art.jpg">
-<p>Hollow Knight</p>
+<!-- GAMES PAGE -->
+<div id="gamesPage" class="page">
+  <div class="container">
+    <div class="section-title">// All Games</div>
+    <div class="grid">
+      <div class="card" data-name="Karlson" onclick="playGame('Karlson.html')"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1228610/capsule_616x353.jpg?t=1649362618"></div>
+      <div class="card" data-name="A Difficult Game About Climbing" onclick="playGame('A Difficult Game About Climbing.html')"><img src="https://www4.minijuegosgratis.com/v3/games/thumbnails/249029_7_sq.jpg"></div>
+      <div class="card" data-name="Hollow Knight" onclick="playGame('Hollow Knight.html')"><img src="https://upload.wikimedia.org/wikipedia/en/d/de/Hollow_Knight_2026_cover_art.jpg"></div>
+      <div class="card" data-name="Minecraft Classic" onclick="playGame('Minecraft 1.12.2.html')"><img src="https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/d/9/a/d9a1f186e29d35026b1a5822fe63950cf59c426d.jpeg"></div>
+      <div class="card" data-name="Gorilla Tag" onclick="playGame('Gorilla Tag.html')"><img src="https://image.api.playstation.com/vulcan/ap/rnd/202410/2514/4744c1ac34e78d50f9ecfbc9958ca6375a2011b1bcf9b9b6.png"></div>
+      <div class="card" data-name="Roblox" onclick="playGame('roblox.html')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png"></div>
+      <div class="card" data-name="Undertale" onclick="playGame('https://frogiesarcade.net/stuff/selfhosted/undertale/index.html')"><img src="https://s3.amazonaws.com/gameopedia_covers/covers/504052/afa774e7566c0e592f9a3d958a70d73e.png"></div>
+      <div class="card" data-name="Fortnite" onclick="playGame('https://www.xbox.com/en-US/play/launch/fortnite/BT5P2X999VH2')"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png"></div>
+      <div class="card" data-name="BTD 5" onclick="playGame('BTD5')"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/306020/capsule_616x353.jpg?t=1770223235"></div>
+      <div class="card" data-name="C.O.D Mobile" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-74.kp%2Cnmweg%2Cfwn-arpq%2Fc%2F3020%3A%2F%60.jtol')"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKiNEpM5ANsuollTpUI3cO5dlQfzJtjxj-pQ&s"></div>
+    </div>
+  </div>
 </div>
 
-<div class="card" onclick="playGame('Minecraft 1.12.2.html')">
-<img src="https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/d/9/a/d9a1f186e29d35026b1a5822fe63950cf59c426d.jpeg">
-<p>Minecraft Classic</p>
+<!-- APPS PAGE -->
+<div id="appsPage" class="page">
+  <div class="container">
+    <div class="section-title">// Apps</div>
+    <div class="grid">
+      <div class="card" data-name="TikTok" onclick="playGame('https://himrbonker.github.io/tiktok/')"><img src="https://sf-static.tiktokcdn.com/obj/eden-sg/uhtyvueh7nulogpoguhm/tiktok-icon2.png"></div>
+      <div class="card" data-name="Discord" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-dksaopd%2Ccmm-lmgkn')"><img src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"></div>
+      <div class="card" data-name="Google Proxy" onclick="playGame('https://himrbonker.github.io/Browser1/')"><img src="https://play-lh.googleusercontent.com/Eh-N9HKWJgQ4Oa5wmhaE5RbHkB3m3Ud9tsW6saUHis05BL7Xnpubi5iamR5lDKd-Ew"></div>
+      <div class="card" data-name="Croxy Proxy" onclick="playGame('https://www.croxyproxy.com')"><img src="https://avatars.githubusercontent.com/u/45306907?v=4"></div>
+      <div class="card" data-name="YouTube" onclick="playGame('yt.html')"><img src="https://yt3.googleusercontent.com/3s6evpqAiDU9tQR4sC2siJippbH2RWVPnwHgyl4V0th2iuQz0VDQZbUhQBGmsxLYo-mjG6TqZQ=s900-c-k-c0x00ffffff-no-rj"></div>
+      <div class="card" data-name="Movies" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-wctah%2Csrelcgrfets%2Cx%7Bz-')"><img src="https://media.istockphoto.com/id/1941543588/vector/vintage-cinema-projector-blue-camera-for-recording-movie-and-video-film.jpg?s=612x612&w=0&k=20&c=OA3NdygMeeREB-mNMg04Z1-BF3dx3zZkGHBsV5pEkfg="></div>
+      <div class="card" data-name="Twitch" onclick="playGame('twitch.html')"><img src="https://m.media-amazon.com/images/I/21kRx-CJsUL.png"></div>
+      <div class="card" data-name="Snapchat" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-wuw%2Cslarcjav.aoo%2FBcnemna83%2Fqpmtniehv%2FU7%5DEFlZWVBkXCEGnkNmMRwCA%5BZ1F%7BZo5la1J4AXrR7fNLAXrR7fMVACACAS')"><img src="https://play-lh.googleusercontent.com/KxeSAjPTKliCErbivNiXrd6cTwfbqUJcbSRPe_IBVK_YmwckfMRS1VIHz-5cgT09yMo=w240-h480-rw"></div>
+      <div class="card" data-name="GitHub" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Feivhwb%252Ccmm-')"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZfLuviePOqQJ1yuhvxr80AsqV91Btr2rqZw&s"></div>
+    </div>
+  </div>
 </div>
 
-<div class="card" onclick="playGame('Gorilla Tag.html')">
-<img src="https://image.api.playstation.com/vulcan/ap/rnd/202410/2514/4744c1ac34e78d50f9ecfbc9958ca6375a2011b1bcf9b9b6.png">
-<p>Gorilla Tag</p>
-</div>
-
-<div class="card" onclick="playGame('roblox.html')">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png">
-<p>Roblox</p>
-</div>
-
-<div class="card" onclick="playGame('https://frogiesarcade.net/stuff/selfhosted/undertale/index.html')">
-<img src="https://s3.amazonaws.com/gameopedia_covers/covers/504052/afa774e7566c0e592f9a3d958a70d73e.png">
-<p>Undertale</p>
-</div>
-
-<div class="card" onclick="playGame('https://www.xbox.com/en-US/play/launch/fortnite/BT5P2X999VH2')">
-<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png">
-<p>Fortnite</p>
-</div>
-
-<div class="card" onclick="playGame('BTD5')">
-<img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/306020/capsule_616x353.jpg?t=1770223235">
-<p>BTD 5</p>
-</div>
-
-<div class="card" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-74.kp%2Cnmweg%2Cfwn-arpq%2Fc%2F3020%3A%2F%60.jtol')">
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKiNEpM5ANsuollTpUI3cO5dlQfzJtjxj-pQ&s">
-<p>C.O.D Mobile</p>
-</div>
-  
-</div>
-</div>
-
-<!-- APPS -->
-
-<div id="appsSection" style="display:none">
-<div class="grid">
-
-<div class="card" onclick="playGame('https://himrbonker.github.io/tiktok/')">
-<img src="https://sf-static.tiktokcdn.com/obj/eden-sg/uhtyvueh7nulogpoguhm/tiktok-icon2.png">
-<p>TikTok</p>
-</div>
-
-<div class="card" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-dksaopd%2Ccmm-lmgkn')">
-<img src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg">
-<p>Discord</p>
-</div>
-
-<div class="card" onclick="playGame('https://himrbonker.github.io/Browser1/')">
-<img src="https://play-lh.googleusercontent.com/Eh-N9HKWJgQ4Oa5wmhaE5RbHkB3m3Ud9tsW6saUHis05BL7Xnpubi5iamR5lDKd-Ew">
-<p>Google Proxy</p>
-</div>
-
-<div class="card" onclick="playGame('https://www.croxyproxy.com')">
-<img src="https://avatars.githubusercontent.com/u/45306907?v=4">
-<p>Croxy Proxy</p>
-</div>
-
-<div class="card" onclick="playGame('yt.html')">
-<img src="https://yt3.googleusercontent.com/3s6evpqAiDU9tQR4sC2siJippbH2RWVPnwHgyl4V0th2iuQz0VDQZbUhQBGmsxLYo-mjG6TqZQ=s900-c-k-c0x00ffffff-no-rj">
-<p>Youtube</p>
-</div>
-
-<div class="card" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-wctah%2Csrelcgrfets%2Cx%7Bz-')">
-<img src="https://media.istockphoto.com/id/1941543588/vector/vintage-cinema-projector-blue-camera-for-recording-movie-and-video-film.jpg?s=612x612&w=0&k=20&c=OA3NdygMeeREB-mNMg04Z1-BF3dx3zZkGHBsV5pEkfg=">
-<p>Movies</p>
-</div>
-
-<div class="card" onclick="playGame('twitch.html')">
-<img src="https://m.media-amazon.com/images/I/21kRx-CJsUL.png">
-<p>Twitch</p>
-</div>
-
-<div class="card" onclick="playGame('https://frogiesarcade.net/frog/ixl/hvtrs8%2F-wuw%2Cslarcjav.aoo%2FBcnemna83%2Fqpmtniehv%2FU7%5DEFlZWVBkXCEGnkNmMRwCA%5BZ1F%7BZo5la1J4AXrR7fNLAXrR7fMVACACAS')">
-<img src="https://play-lh.googleusercontent.com/KxeSAjPTKliCErbivNiXrd6cTwfbqUJcbSRPe_IBVK_YmwckfMRS1VIHz-5cgT09yMo=w240-h480-rw">
-<p>Snapchat</p>
-</div>
-
-<div class="card" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Feivhwb%252Ccmm-')">
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZfLuviePOqQJ1yuhvxr80AsqV91Btr2rqZw&s">
-<p>GitHub</p>
-</div>
-
-
-
-</div>
-</div>
-
-
-<!-- WEBSITES -->
-<div id="webSection" style="display:none">
-<div class="grid">
-
-<div class="card" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Farcz%257Bgcmgs%252Ccmm-')">
-<img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Crazygames_jpg_logo.jpg">
-<p>Crazy Games</p>
-</div>
-
-
-</div>
-</div>
-
+<!-- WEBSITES PAGE -->
+<div id="websPage" class="page">
+  <div class="container">
+    <div class="section-title">// Websites</div>
+    <div class="grid">
+      <div class="card" data-name="Crazy Games" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Farcz%257Bgcmgs%252Ccmm-')"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f3/Crazygames_jpg_logo.jpg"></div>
+    </div>
+  </div>
 </div>
 
 <!-- PLAYER -->
-
 <div class="player" id="player">
-
-<div class="playerbar">
-<button onclick="closeGame()">⬅ Back</button>
+  <div class="playerbar">
+    <button onclick="closeGame()">← Back</button>
+  </div>
+  <iframe id="gameFrame" allowfullscreen></iframe>
 </div>
 
-<iframe id="gameFrame"></iframe>
-
+<!-- BG PANEL -->
+<div id="bgPanel">
+  <div class="bg-box">
+    <h2>Background</h2>
+    <p>Upload a local file or paste a URL</p>
+    <label>
+      Upload image or video
+      <input type="file" accept="image/*,video/*" style="display:none" onchange="handleBgFile(this)">
+      <span>Choose file…</span>
+    </label>
+    <input type="text" id="bgUrlInput" placeholder="https://example.com/image.jpg or video.mp4">
+    <div class="row">
+      <button class="apply" onclick="applyBgUrl()">Apply URL</button>
+      <button class="cancel" onclick="closeBgPanel()">Cancel</button>
+    </div>
+    <div class="row">
+      <button class="cancel" onclick="clearBg()" style="flex:1;border-color:rgba(255,80,80,0.3);color:#a55">Clear background</button>
+    </div>
+  </div>
 </div>
 
 <script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(name + 'Page').classList.add('active');
+}
+function goHome() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('homePage').classList.add('active');
+}
+function playGame(url) {
+  document.getElementById('player').classList.add('open');
+  document.getElementById('gameFrame').src = url;
+}
+function closeGame() {
+  document.getElementById('player').classList.remove('open');
+  document.getElementById('gameFrame').src = '';
+}
+function openBgPanel() { document.getElementById('bgPanel').classList.add('open'); }
+function closeBgPanel() { document.getElementById('bgPanel').classList.remove('open'); }
 
-function playGame(url){
-document.getElementById("player").style.display="flex"
-document.getElementById("gameFrame").src=url
+function setBg(url, isVideo) {
+  const img = document.getElementById('bgImg');
+  const vid = document.getElementById('bgVid');
+  if (isVideo) {
+    img.style.display = 'none';
+    vid.src = url; vid.style.display = 'block'; vid.play();
+  } else {
+    vid.style.display = 'none';
+    img.src = url; img.style.display = 'block';
+  }
 }
 
-function closeGame(){
-document.getElementById("player").style.display="none"
-document.getElementById("gameFrame").src=""
+function handleBgFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const url = URL.createObjectURL(file);
+  const isVideo = file.type.startsWith('video/');
+  setBg(url, isVideo);
+  closeBgPanel();
 }
 
-function showSection(section){
-
-document.getElementById("gamesSection").style.display="none"
-document.getElementById("appsSection").style.display="none"
-document.getElementById("webSection").style.display="none"
-
-
-if(section==="games"){
-document.getElementById("gamesSection").style.display="block"
+function applyBgUrl() {
+  const url = document.getElementById('bgUrlInput').value.trim();
+  if (!url) return;
+  const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url);
+  setBg(url, isVideo);
+  closeBgPanel();
 }
 
-if(section==="apps"){
-document.getElementById("appsSection").style.display="block"
+function clearBg() {
+  const img = document.getElementById('bgImg');
+  const vid = document.getElementById('bgVid');
+  img.style.display = 'none'; img.src = '';
+  vid.style.display = 'none'; vid.src = '';
+  closeBgPanel();
 }
 
-if(section==="webs"){
-document.getElementById("webSection").style.display="block"
-}
-
-}
-
+// close bg panel on backdrop click
+document.getElementById('bgPanel').addEventListener('click', function(e) {
+  if (e.target === this) closeBgPanel();
+});
 </script>
-
 </body>
 </html>
