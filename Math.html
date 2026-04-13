@@ -15,7 +15,6 @@
   --mid: #888888;
   --dark: #333333;
   --black: #000000;
-  --overlay: rgba(0,0,0,0.72);
 }
 
 html, body {
@@ -26,33 +25,23 @@ html, body {
   background: #000;
 }
 
-/* BACKGROUND */
 #bg-layer {
   position: fixed; inset: 0; z-index: 0;
   background: #111;
 }
 #bg-layer img, #bg-layer video {
   width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
+  object-fit: cover; display: block;
   filter: grayscale(100%) brightness(0.45);
 }
 
-/* scanline overlay */
 body::after {
   content: "";
   position: fixed; inset: 0; z-index: 1;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0px,
-    transparent 3px,
-    rgba(0,0,0,0.18) 3px,
-    rgba(0,0,0,0.18) 4px
-  );
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px);
   pointer-events: none;
 }
 
-/* TOPBAR */
 .topbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   display: flex; justify-content: space-between; align-items: center;
@@ -71,119 +60,79 @@ body::after {
 .logo-small:hover { filter: grayscale(0%); color: #00e5ff; }
 
 .nav { display: flex; gap: 10px; align-items: center; }
-
 .nav button {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: var(--mid); padding: 7px 16px;
-  border-radius: 8px; cursor: pointer;
+  font-family: 'Share Tech Mono', monospace; font-size: 13px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18);
+  color: var(--mid); padding: 7px 16px; border-radius: 8px; cursor: pointer;
   filter: grayscale(100%);
   transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s, box-shadow 0.25s;
   letter-spacing: 1px;
 }
 .nav button:hover {
   filter: grayscale(0%); transform: scale(1.12);
-  color: #000; background: #00e5ff;
-  box-shadow: 0 0 16px #00e5ff; border-color: #00e5ff;
+  color: #000; background: #00e5ff; box-shadow: 0 0 16px #00e5ff; border-color: #00e5ff;
 }
 
 #bgBtn {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: var(--mid); font-size: 18px;
-  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--mid); font-size: 18px; width: 36px; height: 36px; border-radius: 8px;
   cursor: pointer; filter: grayscale(100%);
-  transition: filter 0.25s, transform 0.2s;
+  transition: filter 0.25s, transform 0.2s, box-shadow 0.25s, border-color 0.25s;
   display: flex; align-items: center; justify-content: center;
 }
 #bgBtn:hover { filter: grayscale(0%); transform: scale(1.15); }
+#bgBtn.cloaked { filter: grayscale(0%); border-color: #b66fff; box-shadow: 0 0 12px rgba(182,111,255,0.7); }
 
-/* PAGES */
 .page { display: none; position: relative; z-index: 10; }
 .page.active { display: block; }
 
-/* HOME SCREEN */
 #homePage {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: flex-start;
-  padding-top: 110px;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-start; padding-top: 110px;
 }
 .hero { text-align: center; margin-bottom: 60px; }
 
 @keyframes flicker {
-  0%   { opacity: 0; }
-  5%   { opacity: 1; }
-  6%   { opacity: 0; }
-  7%   { opacity: 1; }
-  10%  { opacity: 0; }
-  11%  { opacity: 1; }
-  15%  { opacity: 0.4; }
-  16%  { opacity: 1; }
-  20%  { opacity: 0; }
-  22%  { opacity: 1; }
-  30%  { opacity: 0.7; }
-  31%  { opacity: 0; }
-  32%  { opacity: 1; }
-  40%  { opacity: 1; }
-  50%  { opacity: 0.9; }
-  51%  { opacity: 0; }
-  52%  { opacity: 1; }
-  100% { opacity: 1; }
+  0%{opacity:0}5%{opacity:1}6%{opacity:0}7%{opacity:1}10%{opacity:0}11%{opacity:1}
+  15%{opacity:0.4}16%{opacity:1}20%{opacity:0}22%{opacity:1}30%{opacity:0.7}
+  31%{opacity:0}32%{opacity:1}40%{opacity:1}50%{opacity:0.9}51%{opacity:0}52%{opacity:1}100%{opacity:1}
 }
 @keyframes glow-pulse {
-  0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.1); }
-  50% { text-shadow: 0 0 20px rgba(255,255,255,0.6), 0 0 60px rgba(255,255,255,0.2); }
+  0%,100%{text-shadow:0 0 10px rgba(255,255,255,0.3),0 0 30px rgba(255,255,255,0.1)}
+  50%{text-shadow:0 0 20px rgba(255,255,255,0.6),0 0 60px rgba(255,255,255,0.2)}
 }
 .hero-title {
   font-family: 'Orbitron', monospace;
-  font-size: clamp(38px, 8vw, 90px); font-weight: 900;
+  font-size: clamp(38px,8vw,90px); font-weight: 900;
   letter-spacing: 4px; color: var(--white);
   animation: flicker 2.5s ease-out forwards, glow-pulse 4s ease-in-out infinite 2.5s;
   line-height: 1.1;
 }
 .hero-title .at { color: var(--light); }
 .hero-sub {
-  font-size: 13px; color: var(--mid);
-  letter-spacing: 6px; margin-top: 16px;
-  text-transform: uppercase; opacity: 0;
-  animation: fadeUp 0.6s ease forwards 2.8s;
+  font-size: 13px; color: var(--mid); letter-spacing: 6px; margin-top: 16px;
+  text-transform: uppercase; opacity: 0; animation: fadeUp 0.6s ease forwards 2.8s;
 }
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)}
 }
 .home-label {
   font-size: 11px; letter-spacing: 5px; color: var(--mid);
-  text-transform: uppercase; margin-bottom: 18px;
-  text-align: center; opacity: 0;
-  animation: fadeUp 0.5s ease forwards 3s;
+  text-transform: uppercase; margin-bottom: 18px; text-align: center;
+  opacity: 0; animation: fadeUp 0.5s ease forwards 3s;
 }
 .home-grid {
-  display: flex; gap: 20px; flex-wrap: wrap;
-  justify-content: center; padding: 0 20px;
+  display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; padding: 0 20px;
   opacity: 0; animation: fadeUp 0.7s ease forwards 3.2s;
 }
 .home-grid .card { width: 200px; height: 200px; }
 
-/* GAME GRID */
 .container { padding: 100px 30px 40px; }
-.section-title {
-  font-size: 11px; letter-spacing: 5px; color: var(--mid);
-  text-transform: uppercase; margin-bottom: 20px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
+.section-title { font-size: 11px; letter-spacing: 5px; color: var(--mid); text-transform: uppercase; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 20px; }
 
-/* CARD */
 .card {
-  aspect-ratio: 1/1; border-radius: 18px;
-  overflow: hidden; cursor: pointer; position: relative;
+  aspect-ratio: 1/1; border-radius: 18px; overflow: hidden; cursor: pointer; position: relative;
   filter: grayscale(100%) brightness(0.7);
   transition: filter 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid rgba(255,255,255,0.08);
@@ -191,29 +140,21 @@ body::after {
 .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .card p { display: none; }
 .card:hover {
-  filter: grayscale(0%) brightness(1);
-  transform: scale(1.13);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.35);
-  z-index: 5;
+  filter: grayscale(0%) brightness(1); transform: scale(1.13);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7),0 0 20px rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.35); z-index: 5;
 }
 .card::before {
-  content: attr(data-name);
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.82); color: white;
-  font-size: 11px; letter-spacing: 1px;
-  text-align: center; padding: 6px 4px;
-  transform: translateY(100%);
-  transition: transform 0.2s ease;
-  z-index: 2; font-family: 'Share Tech Mono', monospace;
+  content: attr(data-name); position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.82); color: white; font-size: 11px; letter-spacing: 1px;
+  text-align: center; padding: 6px 4px; transform: translateY(100%);
+  transition: transform 0.2s ease; z-index: 2; font-family: 'Share Tech Mono', monospace;
 }
 .card:hover::before { transform: translateY(0); }
 
-/* PLAYER */
 .player {
   position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,0.97);
-  display: none; flex-direction: column;
+  background: rgba(0,0,0,0.97); display: none; flex-direction: column;
 }
 .player.open { display: flex; }
 .player iframe { flex: 1; border: none; width: 100%; }
@@ -224,30 +165,28 @@ body::after {
 }
 .playerbar button {
   font-family: 'Share Tech Mono', monospace;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--mid); padding: 7px 18px;
-  border-radius: 8px; cursor: pointer; font-size: 13px;
-  filter: grayscale(100%);
-  transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  color: var(--mid); padding: 7px 18px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  filter: grayscale(100%); transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s;
 }
 .playerbar button:hover {
   filter: grayscale(0%); transform: scale(1.1);
   color: #000; background: #00e5ff; border-color: #00e5ff;
 }
 
-/* BG PANEL */
+/* ── BG / SETTINGS PANEL ── */
 #bgPanel {
   display: none; position: fixed; inset: 0; z-index: 150;
-  background: rgba(0,0,0,0.88);
-  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.88); align-items: center; justify-content: center;
 }
 #bgPanel.open { display: flex; }
+
 .bg-box {
   background: #111; border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 16px; padding: 32px; width: 380px;
+  border-radius: 16px; padding: 32px; width: 480px; max-width: 95vw;
   display: flex; flex-direction: column; gap: 14px;
   font-family: 'Share Tech Mono', monospace;
+  max-height: 90vh; overflow-y: auto;
 }
 .bg-box h2 {
   font-family: 'Orbitron', monospace; font-size: 16px;
@@ -279,125 +218,98 @@ body::after {
 .bg-box .row button.cancel { background: transparent; color: var(--mid); border: 1px solid rgba(255,255,255,0.15); }
 .bg-box .row button.cancel:hover { color: white; }
 
-/* PRESETS */
-.preset-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
+.preset-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .preset-btn {
-  position: relative;
-  aspect-ratio: 16/9;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: border-color 0.2s, transform 0.2s;
-  padding: 0;
-  background: #000;
+  position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
+  cursor: pointer; border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s; padding: 0; background: #000;
 }
 .preset-btn:hover { transform: scale(1.06); border-color: rgba(255,255,255,0.5); }
 .preset-btn.active { border-color: #00e5ff; box-shadow: 0 0 10px rgba(0,229,255,0.4); }
 .preset-btn img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: grayscale(40%) brightness(0.7);
-  transition: filter 0.2s;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(40%) brightness(0.7); transition: filter 0.2s;
 }
 .preset-btn:hover img { filter: grayscale(0%) brightness(1); }
 .preset-btn span {
   position: absolute; bottom: 0; left: 0; right: 0;
-  background: rgba(0,0,0,0.75);
-  font-size: 9px; letter-spacing: 1px;
-  text-align: center; padding: 4px 2px;
-  color: #aaa; font-family: 'Share Tech Mono', monospace;
-  text-transform: uppercase;
+  background: rgba(0,0,0,0.75); font-size: 9px; letter-spacing: 1px;
+  text-align: center; padding: 4px 2px; color: #aaa;
+  font-family: 'Share Tech Mono', monospace; text-transform: uppercase;
 }
-.bg-divider {
-  height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0;
+
+.bg-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 2px 0; }
+
+/* ── CLOAK SECTION ── */
+.cloak-section-title {
+  font-size: 11px; letter-spacing: 5px; color: var(--mid); text-transform: uppercase;
 }
+.cloak-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px; padding: 11px 14px;
+}
+.cloak-toggle-row span { font-size: 12px; color: var(--light); letter-spacing: 1px; }
+
+.toggle-switch { position: relative; width: 44px; height: 24px; cursor: pointer; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 99px;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  transition: background 0.25s, border-color 0.25s;
+}
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: #888; transition: transform 0.25s, background 0.25s;
+}
+.toggle-switch input:checked ~ .toggle-track { background: rgba(182,111,255,0.35); border-color: #b66fff; }
+.toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); background: #b66fff; }
+
+.cloak-options { display: none; flex-direction: column; gap: 8px; }
+.cloak-options.visible { display: flex; }
+.cloak-label { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
+.cloak-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab-preset {
+  font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 1px;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--mid); padding: 5px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.tab-preset:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.tab-preset.active { background: rgba(182,111,255,0.2); border-color: #b66fff; color: #d4a8ff; }
 
 /* LOADING SCREEN */
 #loader {
-  position: fixed; inset: 0; z-index: 999;
-  background: #000;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 32px;
+  position: fixed; inset: 0; z-index: 999; background: #000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
   transition: opacity 0.7s ease, visibility 0.7s ease;
 }
-#loader.hidden {
-  opacity: 0; visibility: hidden; pointer-events: none;
-}
+#loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 .loader-logo {
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(30px, 7vw, 64px);
-  font-weight: 900;
-  color: white;
-  letter-spacing: 3px;
-  animation: loaderFlicker 1.6s ease-out forwards;
+  font-family: 'Orbitron', monospace; font-size: clamp(30px,7vw,64px); font-weight: 900;
+  color: white; letter-spacing: 3px; animation: loaderFlicker 1.6s ease-out forwards;
 }
 @keyframes loaderFlicker {
-  0%   { opacity: 0; }
-  6%   { opacity: 1; }
-  7%   { opacity: 0; }
-  9%   { opacity: 1; }
-  13%  { opacity: 0; }
-  14%  { opacity: 1; }
-  20%  { opacity: 0.2; }
-  21%  { opacity: 1; }
-  33%  { opacity: 0; }
-  34%  { opacity: 1; }
-  100% { opacity: 1; }
+  0%{opacity:0}6%{opacity:1}7%{opacity:0}9%{opacity:1}13%{opacity:0}14%{opacity:1}
+  20%{opacity:0.2}21%{opacity:1}33%{opacity:0}34%{opacity:1}100%{opacity:1}
 }
 .loader-bar-wrap {
-  width: min(340px, 72vw);
-  height: 2px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 99px;
-  overflow: hidden;
-  position: relative;
+  width: min(340px,72vw); height: 2px; background: rgba(255,255,255,0.08);
+  border-radius: 99px; overflow: hidden;
 }
 .loader-bar {
-  height: 100%; width: 0%;
-  background: #fff;
-  border-radius: 99px;
-  animation: loadProgress 2.2s cubic-bezier(0.4,0,0.2,1) forwards;
-  position: relative;
+  height: 100%; width: 0%; background: #fff; border-radius: 99px;
+  animation: loadProgress 2.2s cubic-bezier(0.4,0,0.2,1) forwards; position: relative;
 }
 .loader-bar::after {
-  content: '';
-  position: absolute; right: 0; top: -2px;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 0 8px 2px rgba(255,255,255,0.8);
+  content: ''; position: absolute; right: 0; top: -2px; width: 6px; height: 6px;
+  border-radius: 50%; background: white; box-shadow: 0 0 8px 2px rgba(255,255,255,0.8);
 }
 @keyframes loadProgress {
-  0%   { width: 0%; }
-  20%  { width: 18%; }
-  40%  { width: 42%; }
-  65%  { width: 67%; }
-  82%  { width: 85%; }
-  100% { width: 100%; }
+  0%{width:0%}20%{width:18%}40%{width:42%}65%{width:67%}82%{width:85%}100%{width:100%}
 }
-.loader-status {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px; color: var(--mid);
-  letter-spacing: 4px; text-transform: uppercase;
-}
-.loader-dots::after {
-  content: '';
-  animation: dots 1.2s steps(4, end) infinite;
-}
-@keyframes dots {
-  0%   { content: ''; }
-  25%  { content: '.'; }
-  50%  { content: '..'; }
-  75%  { content: '...'; }
-  100% { content: ''; }
-}
+.loader-status { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--mid); letter-spacing: 4px; text-transform: uppercase; }
+.loader-dots::after { content: ''; animation: dots 1.2s steps(4,end) infinite; }
+@keyframes dots { 0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''} }
 
 </style>
 </head>
@@ -425,7 +337,7 @@ body::after {
     <button onclick="showPage('games')">Games</button>
     <button onclick="showPage('apps')">Apps</button>
     <button onclick="showPage('webs')">Sites</button>
-    <button id="bgBtn" onclick="openBgPanel()" title="Change Background">⚙️</button>
+    <button id="bgBtn" onclick="openBgPanel()" title="Settings">⚙️</button>
   </div>
 </div>
 
@@ -437,7 +349,11 @@ body::after {
   </div>
   <div class="home-label">Featured Games</div>
   <div class="home-grid">
-    <div class="card" data-name="TikTok" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Fviitmk%252Ccmm-')"><img src="https://sf-static.tiktokcdn.com/obj/eden-sg/uhtyvueh7nulogpoguhm/tiktok-icon2.png"></div> <div class="card" data-name="Snapchat" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Fqncpahct%252Ccmm-srovlkgjt')"><img src="https://play-lh.googleusercontent.com/KxeSAjPTKliCErbivNiXrd6cTwfbqUJcbSRPe_IBVK_YmwckfMRS1VIHz-5cgT09yMo=w240-h480-rw"></div> <div class="card" data-name="YouTube" onclick="playGame('yt.html')"><img src="https://yt3.googleusercontent.com/3s6evpqAiDU9tQR4sC2siJippbH2RWVPnwHgyl4V0th2iuQz0VDQZbUhQBGmsxLYo-mjG6TqZQ=s900-c-k-c0x00ffffff-no-rj"></div> <div class="card" data-name="Roblox" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F39%253B02%252F%2560.jtol')"> <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png"> </div> <div class="card" data-name="Discord" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Ffiqcmrf.aoo%252F')"><img src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"></div> </div>
+    <div class="card" data-name="TikTok" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Fviitmk%252Ccmm-')"><img src="https://sf-static.tiktokcdn.com/obj/eden-sg/uhtyvueh7nulogpoguhm/tiktok-icon2.png"></div>
+    <div class="card" data-name="Snapchat" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Fqncpahct%252Ccmm-srovlkgjt')"><img src="https://play-lh.googleusercontent.com/KxeSAjPTKliCErbivNiXrd6cTwfbqUJcbSRPe_IBVK_YmwckfMRS1VIHz-5cgT09yMo=w240-h480-rw"></div>
+    <div class="card" data-name="YouTube" onclick="playGame('yt.html')"><img src="https://yt3.googleusercontent.com/3s6evpqAiDU9tQR4sC2siJippbH2RWVPnwHgyl4V0th2iuQz0VDQZbUhQBGmsxLYo-mjG6TqZQ=s900-c-k-c0x00ffffff-no-rj"></div>
+    <div class="card" data-name="Roblox" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F39%253B02%252F%2560.jtol')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png"></div>
+    <div class="card" data-name="Discord" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtr%253A-%252Ffiqcmrf.aoo%252F')"><img src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"></div>
   </div>
 </div>
 
@@ -452,7 +368,7 @@ body::after {
       <div class="card" data-name="Minecraft Classic" onclick="playGame('Minecraft 1.12.2.html')"><img src="https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/4X/d/9/a/d9a1f186e29d35026b1a5822fe63950cf59c426d.jpeg"></div>
       <div class="card" data-name="Gorilla Tag" onclick="playGame('Gorilla Tag.html')"><img src="https://image.api.playstation.com/vulcan/ap/rnd/202410/2514/4744c1ac34e78d50f9ecfbc9958ca6375a2011b1bcf9b9b6.png"></div>
       <div class="card" data-name="Roblox" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F39%253B02%252F%2560.jtol')"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Roblox_%282025%29_%28App_Icon%29.svg/250px-Roblox_%282025%29_%28App_Icon%29.svg.png"></div>
-      <div class="card" data-name="Stuble Guys" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F30213%252F%2560.jtol')"><img src="https://static.wikia.nocookie.net/youtube/images/5/59/Stumble_Guys.jpeg/revision/latest?cb=20240425204135"></div>
+      <div class="card" data-name="Stumble Guys" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F30213%252F%2560.jtol')"><img src="https://static.wikia.nocookie.net/youtube/images/5/59/Stumble_Guys.jpeg/revision/latest?cb=20240425204135"></div>
       <div class="card" data-name="Fortnite" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fcpvokdg%252F7854-artmife%252Chvmn%253Ffegp%255Dlkni%253Dcpvokdgsgapcj%253A-%252Faoo.gpkceaoeq.doptlive')"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Fortnite_F_lettermark_logo.png"></div>
       <div class="card" data-name="BTD 5" onclick="playGame('BTD5')"><img src="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/306020/capsule_616x353.jpg?t=1770223235"></div>
       <div class="card" data-name="C.O.D Mobile" onclick="playGame('https://ghoogle.org/s.html?src=%2Fgo%2Fhvtrs8%252F-nmweg%252Cfwn-arpq%252Fc%252F3020%253A%252F%2560.jtol')"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKiNEpM5ANsuollTpUI3cO5dlQfzJtjxj-pQ&s"></div>
@@ -501,11 +417,13 @@ body::after {
   <iframe id="gameFrame" allowfullscreen></iframe>
 </div>
 
-<!-- BG PANEL -->
+<!-- SETTINGS / BG PANEL -->
 <div id="bgPanel">
-  <div class="bg-box" style="width:480px;max-width:95vw;">
-    <h2>Background</h2>
-    <p style="margin-bottom:2px;">Presets</p>
+  <div class="bg-box">
+    <h2>⚙️ Settings</h2>
+
+    <!-- ── BACKGROUND ── -->
+    <p style="margin-bottom:2px;">Background Presets</p>
     <div class="preset-grid" id="presetGrid">
       <button class="preset-btn active" onclick="applyPreset(this,'https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyNHJkMDYxczNwOGhpb2ZkajE5NG5xMTNubTRya2JicWJ1ajhkNDh6byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fSRQtBAzrPokPCItuu/giphy.gif',false)">
         <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUyNHJkMDYxczNwOGhpb2ZkajE5NG5xMTNubTRya2JicWJ1ajhkNDh6byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/fSRQtBAzrPokPCItuu/giphy.gif"><span>Rain</span>
@@ -535,8 +453,9 @@ body::after {
         <img src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/061c5ef8-2616-48a4-af21-9f97322673b3/deysvi3-4cc39796-d0db-4a42-997f-758d9198ace4.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi8wNjFjNWVmOC0yNjE2LTQ4YTQtYWYyMS05Zjk3MzIyNjczYjMvZGV5c3ZpMy00Y2MzOTc5Ni1kMGRiLTRhNDItOTk3Zi03NThkOTE5OGFjZTQuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.5aTaqjat959mIiwb2XQozDeYHsHO-bWG_9bGCCQgUGw"><span>Cyberpunk</span>
       </button>
     </div>
+
     <div class="bg-divider"></div>
-    <p>Custom</p>
+    <p>Custom Background</p>
     <label>
       Upload image or video
       <input type="file" accept="image/*,video/*" style="display:none" onchange="handleBgFile(this)">
@@ -545,124 +464,142 @@ body::after {
     <input type="text" id="bgUrlInput" placeholder="https://example.com/image.jpg or video.mp4">
     <div class="row">
       <button class="apply" onclick="applyBgUrl()">Apply URL</button>
-      <button class="cancel" onclick="closeBgPanel()">Cancel</button>
+      <button class="cancel" onclick="clearBg()">Clear BG</button>
     </div>
+
+    <!-- ── CLOAK SECTION ── -->
+    <div class="bg-divider"></div>
+    <div class="cloak-section-title">// Tab Cloak</div>
+
+    <div class="cloak-toggle-row">
+      <span>&#128274; about:blank cloak</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="cloakToggle" onchange="onCloakToggle(this)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+
+    <div class="cloak-options" id="cloakOptions">
+      <div class="cloak-label">Tab title shown in browser</div>
+      <div class="cloak-presets">
+        <button class="tab-preset active" onclick="selectTabPreset(this,'Google Classroom')">Google Classroom</button>
+        <button class="tab-preset" onclick="selectTabPreset(this,'Google Docs')">Google Docs</button>
+        <button class="tab-preset" onclick="selectTabPreset(this,'Khan Academy')">Khan Academy</button>
+        <button class="tab-preset" onclick="selectTabPreset(this,'Schoology')">Schoology</button>
+        <button class="tab-preset" onclick="selectTabPreset(this,'Canvas')">Canvas</button>
+      </div>
+      <input type="text" id="cloakTitleInput" placeholder="Custom tab title..." value="Google Classroom">
+    </div>
+
     <div class="row">
-      <button class="cancel" onclick="clearBg()" style="flex:1;border-color:rgba(255,80,80,0.3);color:#a55">Clear background</button>
+      <button class="cancel" onclick="closeBgPanel()" style="flex:1">Close</button>
     </div>
   </div>
 </div>
 
 <script>
-// Loading screen
-const phases = ['Booting systems', 'Loading assets', 'Connecting arcade', 'Almost ready'];
+// ── Loading ──────────────────────────────────────────────────────
+const phases = ['Booting systems','Loading assets','Connecting arcade','Almost ready'];
 let phase = 0;
 const loaderText = document.getElementById('loaderText');
-const phaseInterval = setInterval(() => {
-  phase++;
-  if (phase < phases.length) loaderText.textContent = phases[phase];
-}, 550);
-
+const phaseInterval = setInterval(() => { phase++; if(phase<phases.length) loaderText.textContent=phases[phase]; }, 550);
 window.addEventListener('load', () => {
-  clearInterval(phaseInterval);
-  loaderText.textContent = 'Ready';
-  setTimeout(() => {
-    document.getElementById('loader').classList.add('hidden');
-  }, 600);
+  clearInterval(phaseInterval); loaderText.textContent='Ready';
+  setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 600);
 });
+setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 3200);
 
-// Fallback: hide after 3s even if load doesn't fire cleanly
-setTimeout(() => {
-  document.getElementById('loader').classList.add('hidden');
-}, 3200);
+// ── Cloak state ──────────────────────────────────────────────────
+let cloakEnabled = false;
+let cloakTitle   = 'Google Classroom';
 
+function onCloakToggle(cb) {
+  cloakEnabled = cb.checked;
+  document.getElementById('cloakOptions').classList.toggle('visible', cb.checked);
+  document.getElementById('bgBtn').classList.toggle('cloaked', cb.checked);
+}
+
+function selectTabPreset(btn, title) {
+  document.querySelectorAll('.tab-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cloakTitleInput').value = title;
+  cloakTitle = title;
+}
+
+// ── about:blank launcher ─────────────────────────────────────────
+function launchCloaked(url) {
+  const tab = window.open('about:blank','_blank');
+  if (!tab) { alert('Pop-up blocked! Allow pop-ups for this site.'); return; }
+  const t = (document.getElementById('cloakTitleInput').value.trim() || cloakTitle).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const u = url.replace(/"/g,'&quot;');
+  tab.document.open();
+  tab.document.write(`<!DOCTYPE html><html><head><title>${t}</title><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;background:#000}iframe{width:100%;height:100%;border:none;display:block}</style></head><body><iframe src="${u}" allowfullscreen allow="fullscreen *; autoplay *; clipboard-write *"></iframe></body></html>`);
+  tab.document.close();
+}
+
+// ── Navigation ───────────────────────────────────────────────────
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(name + 'Page').classList.add('active');
+  document.getElementById(name+'Page').classList.add('active');
 }
 function goHome() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('homePage').classList.add('active');
 }
+
+// ── Game launcher ────────────────────────────────────────────────
 function playGame(url) {
+  if (cloakEnabled) { launchCloaked(url); return; }
   const loader = document.getElementById('loader');
   const loaderText = document.getElementById('loaderText');
-  const frame = document.getElementById('gameFrame');
-
-  // Reset loader state
+  const frame  = document.getElementById('gameFrame');
   loader.classList.remove('hidden');
   loaderText.textContent = 'Loading Game';
-
-  // Restart loading bar animation
   const bar = loader.querySelector('.loader-bar');
-  bar.style.animation = 'none';
-  bar.offsetHeight; // force reflow
-  bar.style.animation = '';
-
-  // Open player
+  bar.style.animation='none'; bar.offsetHeight; bar.style.animation='';
   document.getElementById('player').classList.add('open');
-
-  // Set iframe
   frame.src = url;
-
-  // When game loads → hide loader
-  frame.onload = () => {
-    setTimeout(() => {
-      loader.classList.add('hidden');
-    }, 400);
-  };
-
-  // Fallback (in case iframe never fires onload)
-  setTimeout(() => {
-    loader.classList.add('hidden');
-  }, 5000);
+  frame.onload = () => { setTimeout(() => { loader.classList.add('hidden'); }, 400); };
+  setTimeout(() => { loader.classList.add('hidden'); }, 5000);
 }
+
 function closeGame() {
   document.getElementById('player').classList.remove('open');
   document.getElementById('gameFrame').src = '';
-
-  // Hide loader just in case
   document.getElementById('loader').classList.add('hidden');
 }
+
+// ── Background ───────────────────────────────────────────────────
 function applyPreset(btn, url, isVideo) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   setBg(url, isVideo);
-  setTimeout(closeBgPanel, 200);
 }
-function openBgPanel() { document.getElementById('bgPanel').classList.add('open'); }
-function closeBgPanel() { document.getElementById('bgPanel').classList.remove('open'); }
-
+function openBgPanel()  { document.getElementById('bgPanel').classList.add('open'); }
+function closeBgPanel() {
+  cloakTitle = document.getElementById('cloakTitleInput').value.trim() || 'Google Classroom';
+  document.getElementById('bgPanel').classList.remove('open');
+}
 function setBg(url, isVideo) {
-  const img = document.getElementById('bgImg');
-  const vid = document.getElementById('bgVid');
-  if (isVideo) {
-    img.style.display = 'none';
-    vid.src = url; vid.style.display = 'block'; vid.play();
-  } else {
-    vid.style.display = 'none';
-    img.src = url; img.style.display = 'block';
-  }
+  const img=document.getElementById('bgImg'), vid=document.getElementById('bgVid');
+  if (isVideo) { img.style.display='none'; vid.src=url; vid.style.display='block'; vid.play(); }
+  else { vid.style.display='none'; img.src=url; img.style.display='block'; }
 }
 function handleBgFile(input) {
-  const file = input.files[0]; if (!file) return;
-  setBg(URL.createObjectURL(file), file.type.startsWith('video/'));
-  closeBgPanel();
+  const file=input.files[0]; if(!file) return;
+  setBg(URL.createObjectURL(file), file.type.startsWith('video/')); closeBgPanel();
 }
 function applyBgUrl() {
-  const url = document.getElementById('bgUrlInput').value.trim();
-  if (!url) return;
+  const url=document.getElementById('bgUrlInput').value.trim(); if(!url) return;
   setBg(url, /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url));
-  closeBgPanel();
 }
 function clearBg() {
-  const img = document.getElementById('bgImg'), vid = document.getElementById('bgVid');
-  img.style.display = 'none'; img.src = '';
-  vid.style.display = 'none'; vid.src = '';
-  closeBgPanel();
+  const img=document.getElementById('bgImg'), vid=document.getElementById('bgVid');
+  img.style.display='none'; img.src=''; vid.style.display='none'; vid.src='';
 }
 document.getElementById('bgPanel').addEventListener('click', function(e) {
-  if (e.target === this) closeBgPanel();
+  if (e.target===this) closeBgPanel();
 });
 </script>
 </body>
