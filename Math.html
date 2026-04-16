@@ -380,6 +380,57 @@ body::after {
 .loader-dots::after { content: ''; animation: dots 1.2s steps(4,end) infinite; }
 @keyframes dots { 0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''} }
 
+#newsOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+
+#newsOverlay.open { display: flex; }
+
+#newsBox {
+  width: min(600px, 90vw);
+  max-height: 80vh;
+  background: #0d0d0d;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: modalPop 0.25s ease;
+}
+
+.news-header {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.news-content {
+  overflow-y: auto;
+  font-size: 13px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.news-close {
+  align-self: flex-end;
+  background: #f87171;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.news-close:hover {
+  background: red;
+  color: white;
+}
 </style>
 </head>
 <body>
@@ -702,6 +753,61 @@ function clearBg() {
 document.getElementById('bgPanel').addEventListener('click', function(e) {
   if (e.target===this) closeBgPanel();
 });
+
+// ── NEWS SYSTEM ─────────────────────────────────────────
+
+// 🔥 CHANGE THIS WHEN YOU ADD NEWS
+const NEWS_VERSION = "1";
+
+const savedVersion = localStorage.getItem("seenNewsVersion");
+const badge = document.getElementById("newsBadge");
+
+// show "!" if new
+if (savedVersion !== NEWS_VERSION) {
+  badge.style.display = "inline";
+} else {
+  badge.style.display = "none";
+}
+
+// open modal
+function openNews() {
+  document.getElementById("newsOverlay").classList.add("open");
+
+  localStorage.setItem("seenNewsVersion", NEWS_VERSION);
+  badge.style.display = "none";
+}
+
+// close if clicking outside
+function closeNews(e) {
+  if (e.target.id === "newsOverlay") {
+    document.getElementById("newsOverlay").classList.remove("open");
+  }
+}
+
+// force close button
+function forceCloseNews() {
+  document.getElementById("newsOverlay").classList.remove("open");
+}
+
 </script>
+<!-- NEWS BUTTON -->
+<!-- NEWS MODAL -->
+<div id="newsOverlay" onclick="closeNews(event)">
+  <div id="newsBox">
+    <div class="news-header">// NEWS</div>
+    <div class="news-content" id="newsContent">
+      
+      <!-- ✏️ EDIT YOUR NEWS HERE -->
+      <p><b>v1.0</b></p>
+      <ul>
+        
+        <li>Added Fullscreen</li>
+        <li>🚨 LINK CHANGE SOON[if blocked(IAN! >:( )] 🚨</li>
+      </ul>
+
+    </div>
+    <button class="news-close" onclick="forceCloseNews()">Close</button>
+  </div>
+</div>
 </body>
 </html>
