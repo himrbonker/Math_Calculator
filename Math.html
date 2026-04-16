@@ -65,7 +65,30 @@ body::after {
 }
 .logo-small:hover { filter: grayscale(0%); color: #00e5ff; }
 
-.nav { display: flex; gap: 10px; align-items: center; }
+<div class="nav">
+  <button onclick="showPage('games')">Games</button>
+  <button onclick="showPage('apps')">Apps</button>
+  <button onclick="showPage('webs')">Sites</button>
+
+  <!-- ADD THIS -->
+  <button onclick="openNews()" style="position:relative;">
+    News
+    <span id="newsBadge" style="
+      display:none;
+      position:absolute;
+      top:-6px;
+      right:-6px;
+      background:#ff3b3b;
+      color:white;
+      font-size:10px;
+      padding:2px 6px;
+      border-radius:999px;
+      font-family:'Share Tech Mono', monospace;
+    ">!</span>
+  </button>
+
+  <button id="bgBtn" onclick="openBgPanel()">⚙️</button>
+</div>
 .nav button {
   font-family: 'Share Tech Mono', monospace; font-size: 13px;
   background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18);
@@ -74,6 +97,7 @@ body::after {
   transition: filter 0.25s, transform 0.2s, color 0.25s, background 0.25s, box-shadow 0.25s;
   letter-spacing: 1px;
 }
+     
 .nav button:hover {
   filter: grayscale(0%); transform: scale(1.12);
   color: #000; background: #00e5ff; box-shadow: 0 0 16px #00e5ff; border-color: #00e5ff;
